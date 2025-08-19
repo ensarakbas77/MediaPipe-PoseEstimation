@@ -3,7 +3,6 @@ import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 
-# === MODEL OLUŞTURMA ===
 base_options = python.BaseOptions(model_asset_path='pose_landmarker_heavy.task')
 options = vision.PoseLandmarkerOptions(
     base_options=base_options,
@@ -13,10 +12,9 @@ options = vision.PoseLandmarkerOptions(
     min_pose_presence_confidence=0.5,
     min_tracking_confidence=0.6,
 )
-# PoseLandmarker nesnesini oluştur
+
 detector = vision.PoseLandmarker.create_from_options(options)
 
-# Video dosyasını açs
 cap = cv2.VideoCapture("football.mp4")
 
 POSE_CONNECTIONS = mp.solutions.pose.POSE_CONNECTIONS
@@ -32,15 +30,15 @@ while cap.isOpened():
     mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_frame)
     h, w, _ = frame.shape
 
-    # Poz tahmini yap
+
     detection_result = detector.detect_for_video(mp_image, int(cap.get(cv2.CAP_PROP_POS_MSEC)))
     if detection_result.pose_landmarks:
         for pose_landmarks in detection_result.pose_landmarks:
-            # Noktaları çiz
+
             for lm in pose_landmarks:
                 cx, cy = int(lm.x * w), int(lm.y * h)
                 cv2.circle(frame, (cx, cy), 3, (0, 255, 0), -1)
-            # Bağlantıları çiz
+
             for connection in POSE_CONNECTIONS:
                 start_idx, end_idx = connection
                 if start_idx < len(pose_landmarks) and end_idx < len(pose_landmarks):
